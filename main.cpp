@@ -5,44 +5,53 @@
 #include <windows.h>
 #include "getch.h"
 
-#define ROWS 10
 #define COLS 11
+#define ROWS 10
+
+#include "matrix.h"
+#include "pacman.h"
+
+
 
 int main ( )
 {
-    int size = ROWS * COLS;
-    char c; int i = ROWS / 2, j = ROWS / 2;
+    FILE *map;
+    int mapSize = ROWS * COLS; 
+    char c; 
+
+    int i = 0, j = 0; // start point for Q, P
+
     char mass[ROWS][COLS];
 
-    std::fill ( &(**mass), &(**mass)+size, '*' );
+    map = fopen("map.in", "r");
 
-    for ( int k = 0; k < ROWS; k++ )
-        mass[k][ROWS] = '\n';
+    matrixScanChar(map, mass);
+    
     mass[i][j] = 'Q';
 
     do {
         system("cls");
-        copy ( &(**mass), &(**mass) + size, std::ostream_iterator<char>( std::cout ) );
+        copy ( &(**mass), &(**mass)+mapSize, std::ostream_iterator<char>(std::cout));
         c = getch();
-        switch ( c) {
-            case 72: 
-                case 'w': if ( i >  0 ){ mass[i][j] = '*'; i--;}
+
+        switch ( c )
+        {
+            case 72: case 'w': if ( moove('w', mass, i, j) ){ mass[i][j] = '.'; i--;}
             break;
-            case 80: 
-                case 's': if ( i < ROWS - 1 ){ mass[i][j] = '*'; i++;}
+            case 80: case 's': if ( moove('s', mass, i, j) ){ mass[i][j] = '.'; i++;}
             break;
-            case 75: 
-                case 'a': if ( j >  0 ){ mass[i][j] = '*'; j--;}
+            case 75: case 'a': if ( moove('a', mass, i, j) ){ mass[i][j] = '.'; j--;}
             break;
-            case 77: 
-                case 'd': if ( j < ROWS - 1 ){ mass[i][j] = '*'; j++;}
+            case 77: case 'd': if ( moove('d', mass, i, j) ){ mass[i][j] = '.'; j++;}
             break;
-        default: ;
+            default: ;
         }
         mass[i][j] = 'Q';
     }
-
     while( c!= 27); // Esc
+
+    fclose(map);
     system("pause");
+    
     return 0;
 }
